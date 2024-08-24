@@ -16,11 +16,11 @@ namespace TerraCloudRaspberry.Infrastructure
         {
             //IoT Hub
             services.AddScoped<IIoTHubService, IoTHubService>();
-            services.Configure<IoTHubOptions>(options => config.GetSection("IoTHub"));
+            services.Configure<IoTHubOptions>(options => config.GetSection("IoTHub").Bind(options));
             
             //TerraCloud Api
             services.AddScoped<ITerraCloudWebService, TerraCloudWebService>();
-            services.Configure<TerraCloudWebOptions>(options => config.GetSection("TerraCloudWeb"));
+            services.Configure<TerraCloudWebOptions>(options => config.GetSection("TerraCloudWeb").Bind(options));
 
             return services;
         }

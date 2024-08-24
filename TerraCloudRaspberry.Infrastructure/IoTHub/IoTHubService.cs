@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Shared;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,16 +12,16 @@ namespace TerraCloudRaspberry.Infrastructure.IoTHub
 {
     public class IoTHubService : IIoTHubService
     {
-        private const string DeviceConnectionString = "HostName=terracloud.azure-devices.net;DeviceId=Test;SharedAccessKey=+bhjW2qoy/U1dN44tDdotufGSr3SNcg4uAIoTJcoXL4=";
-        static DeviceClient deviceClient = null;
+        private readonly IoTHubOptions _ioTHubOptions;
+        public IoTHubService(IOptions<IoTHubOptions> ioTHubOptions)
+        {
+            _ioTHubOptions = ioTHubOptions.Value;
+        }
 
         public async Task Start(CancellationToken token)
         {
             try
             {
-                Console.WriteLine("Connecting to hub");
-                deviceClient = DeviceClient.CreateFromConnectionString(DeviceConnectionString, TransportType.Mqtt);
-
                 await ReceiveMessagesAsync(token);
             }
             catch (Exception ex)
@@ -32,7 +33,10 @@ namespace TerraCloudRaspberry.Infrastructure.IoTHub
 
         private async Task ReceiveMessagesAsync(CancellationToken token)
         {
-            Console.WriteLine("Oczekiwanie na wiadomości z IoT Hub...");
+            Console.WriteLine("Connecting to hub");
+            DeviceClient deviceClient = DeviceClient.CreateFromConnectionString(_ioTHubOptions.ConnectionString, TransportType.Mqtt);
+            
+            Console.WriteLine("Wait for Message from IoT Hub...");
 
             while (!token.IsCancellationRequested)
             {
@@ -41,7 +45,7 @@ namespace TerraCloudRaspberry.Infrastructure.IoTHub
                 if (receivedMessage != null)
                 {
                     var messageData = Encoding.ASCII.GetString(receivedMessage.GetBytes());
-                    Console.WriteLine($"Otrzymano wiadomość: {messageData}");
+                    Console.WriteLine($"Message received: {messageData}");
 
                     await deviceClient.CompleteAsync(receivedMessage);
                 }
