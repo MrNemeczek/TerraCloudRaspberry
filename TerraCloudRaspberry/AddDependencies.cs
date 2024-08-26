@@ -1,20 +1,27 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
 using TerraCloudRaspberry.BackgroundServices;
-using TerraCloudRaspberry.Infrastructure.IoTHub;
 
 namespace TerraCloudRaspberry
 {
     public static class AddDependencies
     {
-        public static IServiceCollection AddProgram(this IServiceCollection services)
+        public static IServiceCollection AddProgram(this IServiceCollection services, IConfiguration config)
         {
             services.AddHostedService<ReceiveMsgsFromCloudHostedService>();
+            services.AddHostedService<SendMeasurementHostedService>();
+
+            services.AddHttpClient("terracloud", client =>
+            {
+                client.BaseAddress = new Uri(config["TerraCloudWeb:Url"] ?? "https://localhost:7291/api/");
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
+            });
+
+            services.AddMemoryCache();
 
             return services;
         }

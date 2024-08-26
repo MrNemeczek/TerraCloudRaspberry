@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TerraCloudRaspberry.Common.Api
+﻿namespace TerraCloudRaspberry.Common.Api
 {
-    internal interface IApiRequest
+    public interface IApiRequest
     {
         /// <summary>
         /// 

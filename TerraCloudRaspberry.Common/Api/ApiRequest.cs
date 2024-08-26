@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -13,14 +14,14 @@ namespace TerraCloudRaspberry.Common.Api
         private readonly JsonSerializerOptions _options;
         private readonly HttpClient _http;
 
-        public ApiRequest()
+        public ApiRequest(IHttpClientFactory httpClientFactory)
         {
             _options = new JsonSerializerOptions()
             {
                 PropertyNameCaseInsensitive = true
             };
 
-            _http = new();            
+            _http = httpClientFactory.CreateClient("terracloud");
         }
 
         public async Task<TResult> PostAsync<TResult, TBody>(string endpoint, TBody body)

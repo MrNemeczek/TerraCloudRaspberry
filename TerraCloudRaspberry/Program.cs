@@ -19,7 +19,7 @@ namespace TerraCloudRaspberry
 
             builder.Services.AddCommon()
                 .AddInfrastructure(config)
-                .AddProgram();
+                .AddProgram(config);
 
             using IHost host = builder.Build();
             await host.RunAsync();
