@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using TerraCloudRaspberry.Common.Api;
 using TerraCloudRaspberry.Infrastructure.IoTHub;
 using TerraCloudRaspberry.Infrastructure.TerraCloudWeb.Models;
+using TerraCloudRaspberry.Infrastructure.TerraCloudWeb.Models.Responses;
 using TerraCloudRaspberry.Persistance.Cache;
 
 namespace TerraCloudRaspberry.Infrastructure.TerraCloudWeb
@@ -30,17 +31,28 @@ namespace TerraCloudRaspberry.Infrastructure.TerraCloudWeb
 
         public async Task AddMeasurement()
         {
-            if (!_cache.TryGetValue(CacheKeys.JWT, out LoginResponse? loginResponse))
+            if (!_cache.TryGetValue(CacheKeys.JWT, out string? tokenJWT))
             {
                 await Login();
             }
 
+            // TODO: zczytywanie danych z czujnikow
+            AddDeviceMeasurementRequest request = new AddDeviceMeasurementRequest()
+            {
+                UniqueCode = _ioTHubOptions.DeviceUniqueCode,
+                Temperature = 22,
+                Humidity = 33
+            };
 
+            await _apiRequest.OnlyPostAsync<AddDeviceMeasurementRequest>(Endpoints.AddMeasurement, request);
         }
 
-        public Task GetDeviceSettings()
+        public async Task<GetDeviceResponse> GetDeviceSettings()
         {
-            throw new NotImplementedException();
+            GetDeviceResponse response = await _apiRequest.GetAsync<GetDeviceResponse>(Endpoints.GetDevice + _terraCloudWebOptions.DeviceId);
+            _cache.Set(CacheKeys.Device, response);
+
+            return response;
         }
 
         public async Task<LoginResponse> Login()
@@ -52,7 +64,7 @@ namespace TerraCloudRaspberry.Infrastructure.TerraCloudWeb
             };
 
             LoginResponse response = await _apiRequest.PostAsync<LoginResponse, LoginRequest>(Endpoints.Auth, loginRequest);
-            _cache.Set(CacheKeys.JWT, response);
+            _cache.Set(CacheKeys.JWT, response.Token);
 
             return response;
         }

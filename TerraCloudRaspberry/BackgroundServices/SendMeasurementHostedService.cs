@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
@@ -13,10 +14,12 @@ namespace TerraCloudRaspberry.BackgroundServices
     internal class SendMeasurementHostedService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly IMemoryCache _cache;
 
-        public SendMeasurementHostedService(IServiceProvider serviceProvider)
+        public SendMeasurementHostedService(IServiceProvider serviceProvider, IMemoryCache cache)
         {
             _serviceProvider = serviceProvider;
+            _cache = cache;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -24,11 +27,13 @@ namespace TerraCloudRaspberry.BackgroundServices
             using var scope = _serviceProvider.CreateScope();
             var terraCloudWebService = scope.ServiceProvider.GetRequiredService<ITerraCloudWebService>();
 
+            await terraCloudWebService.Login();
+            var deviceSettings = await terraCloudWebService.GetDeviceSettings();
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 await terraCloudWebService.AddMeasurement();
-                //wziac delay z ustawien
-                await Task.Delay(TimeSpan.FromMinutes(1));
+                await Task.Delay(TimeSpan.FromMinutes(deviceSettings.MeasurementTime));
             }
         }
     }

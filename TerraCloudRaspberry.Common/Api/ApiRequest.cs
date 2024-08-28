@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Caching.Memory;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -6,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using TerraCloudRaspberry.Persistance.Cache;
 
 namespace TerraCloudRaspberry.Common.Api
 {
@@ -13,8 +15,9 @@ namespace TerraCloudRaspberry.Common.Api
     {
         private readonly JsonSerializerOptions _options;
         private readonly HttpClient _http;
+        private readonly IMemoryCache _cache;
 
-        public ApiRequest(IHttpClientFactory httpClientFactory)
+        public ApiRequest(IHttpClientFactory httpClientFactory, IMemoryCache cache)
         {
             _options = new JsonSerializerOptions()
             {
@@ -22,6 +25,7 @@ namespace TerraCloudRaspberry.Common.Api
             };
 
             _http = httpClientFactory.CreateClient("terracloud");
+            _cache = cache;
         }
 
         public async Task<TResult> PostAsync<TResult, TBody>(string endpoint, TBody body)
@@ -141,11 +145,12 @@ namespace TerraCloudRaspberry.Common.Api
 
         private async Task SetAuthorization()
         {
-            //string tokenJWT = await _localStorageService.GetItemAsStringAsync("jwt");
-            //if (string.IsNullOrEmpty(tokenJWT)) return;
+            if (!_cache.TryGetValue(CacheKeys.JWT, out string? tokenJWT))
+            {
+                return;
+            }
 
-            //tokenJWT = tokenJWT.Trim('\"');
-            //_http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenJWT);
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenJWT);
         }
     }
 }
