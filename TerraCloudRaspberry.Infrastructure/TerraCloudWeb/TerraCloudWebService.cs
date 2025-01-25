@@ -1,12 +1,8 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerraCloudRaspberry.Common.Api;
 using TerraCloudRaspberry.Infrastructure.IoTHub;
+using TerraCloudRaspberry.Infrastructure.Sensor;
 using TerraCloudRaspberry.Infrastructure.TerraCloudWeb.Models;
 using TerraCloudRaspberry.Infrastructure.TerraCloudWeb.Models.Responses;
 using TerraCloudRaspberry.Persistance.Cache;
@@ -17,16 +13,19 @@ namespace TerraCloudRaspberry.Infrastructure.TerraCloudWeb
     {
         private readonly IApiRequest _apiRequest;
         private readonly IMemoryCache _cache;
+        private readonly ISensorService _sensorService;
+
         private readonly IoTHubOptions _ioTHubOptions;
         private readonly TerraCloudWebOptions _terraCloudWebOptions;
 
 
-        public TerraCloudWebService(IApiRequest apiRequest, IOptions<IoTHubOptions> ioTHubOptions, IOptions<TerraCloudWebOptions> terraCloudWebOptions, IMemoryCache cache)
+        public TerraCloudWebService(IApiRequest apiRequest, IOptions<IoTHubOptions> ioTHubOptions, IOptions<TerraCloudWebOptions> terraCloudWebOptions, IMemoryCache cache, ISensorService sensorService)
         {
             _apiRequest = apiRequest;
             _ioTHubOptions = ioTHubOptions.Value;
             _terraCloudWebOptions = terraCloudWebOptions.Value;
             _cache = cache;
+            _sensorService = sensorService;
         }
 
         public async Task AddMeasurement()

@@ -1,12 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TerraCloudRaspberry.Infrastructure.IoTHub;
 using TerraCloudRaspberry.Infrastructure.TerraCloudWeb;
 
 namespace TerraCloudRaspberry.BackgroundServices

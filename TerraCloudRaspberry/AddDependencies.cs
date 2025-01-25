@@ -11,6 +11,7 @@ namespace TerraCloudRaspberry
         {
             services.AddHostedService<ReceiveMsgsFromCloudHostedService>();
             services.AddHostedService<SendMeasurementHostedService>();
+            services.AddHostedService<RelayControllerHostedService>();
 
             services.AddHttpClient("terracloud", client =>
             {

@@ -1,11 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerraCloudRaspberry.Infrastructure.IoTHub;
+using TerraCloudRaspberry.Infrastructure.Relay;
+using TerraCloudRaspberry.Infrastructure.Sensor;
 using TerraCloudRaspberry.Infrastructure.TerraCloudWeb;
 
 namespace TerraCloudRaspberry.Infrastructure
@@ -21,6 +18,12 @@ namespace TerraCloudRaspberry.Infrastructure
             //TerraCloud Api
             services.AddScoped<ITerraCloudWebService, TerraCloudWebService>();
             services.Configure<TerraCloudWebOptions>(options => config.GetSection("TerraCloudWeb").Bind(options));
+
+            //Relay
+            services.AddScoped<IRelayService, RelayService>();
+
+            //Sensor
+            services.AddScoped<ISensorService, SensorService>();
 
             return services;
         }
