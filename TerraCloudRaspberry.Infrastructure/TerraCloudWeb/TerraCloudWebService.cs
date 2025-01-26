@@ -4,6 +4,7 @@ using TerraCloudRaspberry.Common.Api;
 using TerraCloudRaspberry.Infrastructure.IoTHub;
 using TerraCloudRaspberry.Infrastructure.Sensor;
 using TerraCloudRaspberry.Infrastructure.TerraCloudWeb.Models;
+using TerraCloudRaspberry.Infrastructure.TerraCloudWeb.Models.Requests;
 using TerraCloudRaspberry.Infrastructure.TerraCloudWeb.Models.Responses;
 using TerraCloudRaspberry.Persistance.Cache;
 
@@ -35,13 +36,9 @@ namespace TerraCloudRaspberry.Infrastructure.TerraCloudWeb
                 await Login();
             }
 
-            // TODO: zczytywanie danych z czujnikow
-            AddDeviceMeasurementRequest request = new AddDeviceMeasurementRequest()
-            {
-                UniqueCode = _ioTHubOptions.DeviceUniqueCode,
-                Temperature = 22,
-                Humidity = 33
-            };
+            var request = _sensorService.ReadData();
+
+            request.UniqueCode = _ioTHubOptions.DeviceUniqueCode;
 
             await _apiRequest.OnlyPostAsync<AddDeviceMeasurementRequest>(Endpoints.AddMeasurement, request);
         }

@@ -1,7 +1,9 @@
-﻿namespace TerraCloudRaspberry.Infrastructure.Sensor
+﻿using TerraCloudRaspberry.Infrastructure.TerraCloudWeb.Models.Requests;
+
+namespace TerraCloudRaspberry.Infrastructure.Sensor
 {
     public interface ISensorService
     {
-        void ReadData();
+        AddDeviceMeasurementRequest ReadData();
     }
 }

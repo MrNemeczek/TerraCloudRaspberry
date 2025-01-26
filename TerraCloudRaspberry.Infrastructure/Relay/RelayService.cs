@@ -1,4 +1,5 @@
-﻿using System.Device.Gpio;
+﻿extern alias Gpio;
+using Gpio::System.Device.Gpio;
 
 namespace TerraCloudRaspberry.Infrastructure.Relay
 {

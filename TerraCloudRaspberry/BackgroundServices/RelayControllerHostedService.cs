@@ -25,22 +25,45 @@ namespace TerraCloudRaspberry.BackgroundServices
             await terraCloudWebService.Login();
             var deviceSettings = await terraCloudWebService.GetDeviceSettings();
 
-            bool test = true;
-
             while (!stoppingToken.IsCancellationRequested)
             {
-                if (test)
+                var results = sensorService.ReadData();
+
+                // Pobierz aktualny czas
+                var currentTime = DateTime.Now.TimeOfDay;
+
+                // Definicja zakresów dnia i nocy
+                var dayStart = TimeSpan.FromHours(8);  // Dzień zaczyna się o 8:00
+                var dayEnd = TimeSpan.FromHours(20);   // Dzień kończy się o 20:00
+
+                // Sprawdź, czy aktualny czas mieści się w zakresie dnia
+                bool isDay = currentTime >= dayStart && currentTime < dayEnd;
+
+                if (isDay)
                 {
-                    relayService.TurnOn();
+                    if (results.Temperature < deviceSettings.DayTemperature)
+                    {
+                        relayService.TurnOn(); // Włącz przekaźnik, jeśli temperatura za niska w dzień
+                    }
+                    else
+                    {
+                        relayService.TurnOff(); // Wyłącz przekaźnik, jeśli temperatura w normie w dzień
+                    }
                 }
                 else
                 {
-                    relayService.TurnOff();
+                    if (results.Temperature < deviceSettings.NightTemperature)
+                    {
+                        relayService.TurnOn(); // Włącz przekaźnik, jeśli temperatura za niska w nocy
+                    }
+                    else
+                    {
+                        relayService.TurnOff(); // Wyłącz przekaźnik, jeśli temperatura w normie w nocy
+                    }
                 }
 
-                test = !test;
-
-                await Task.Delay(TimeSpan.FromMinutes(1));
+                // Opóźnienie 5 minut między kolejnymi odczytami
+                await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
         }
     }
