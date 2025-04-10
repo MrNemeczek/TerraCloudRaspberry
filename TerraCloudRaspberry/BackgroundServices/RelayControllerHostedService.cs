@@ -23,10 +23,10 @@ namespace TerraCloudRaspberry.BackgroundServices
             var relayService = scope.ServiceProvider.GetRequiredService<IRelayService>();
 
             await terraCloudWebService.Login();
-            var deviceSettings = await terraCloudWebService.GetDeviceSettings();
 
             while (!stoppingToken.IsCancellationRequested)
             {
+                var deviceSettings = await terraCloudWebService.GetDeviceSettings();
                 var results = sensorService.ReadData();
 
                 // Pobierz aktualny czas
